@@ -12,7 +12,14 @@ class RoleService {
         return await RoleRepository.findOne({
             slug: slug
         })
-    }
+    };
+    findUserRoleByUserId = async (userId) => {
+        return await UserRoleRepository.findOne(
+            { user_fk: userId },
+            "role_fk"
+        );
+    };
+
 
 }
 module.exports = RoleService;

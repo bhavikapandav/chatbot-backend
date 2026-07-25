@@ -1,3 +1,4 @@
 module.exports = {
-    DataService: require("./data")
+    DataService: require("./data"),
+    IntegrationService: require("./integration")
 }

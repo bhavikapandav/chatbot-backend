@@ -1,6 +1,8 @@
 const { UserRepository } = require("../../repositories")
 class userService {
     findOne = async (options) => {
+        console.log("options============", options);
+
         return await UserRepository.findOne(options);
     }
     create = async (requestData) => {

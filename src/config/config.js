@@ -16,5 +16,6 @@ const config = {
         algorithm: process.env[`JWT_ALGORITHM_${envMode}`],
         token_life: process.env[`JWT_TOKEN_LIFE_${envMode}`],
     },
+    gemini_api_key:     process.env[`GEMINI_API_KEY_${envMode}`]
 }
 module.exports = config;

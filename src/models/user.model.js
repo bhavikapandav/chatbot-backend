@@ -26,19 +26,20 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// // Pre-save hook to hash password
-// userSchema.pre("save", async function () {
-//   if (!this.isModified("password")) {
-//     return;
-//   }
-//   const salt = await bcrypt.genSalt(10);
-//   this.password = await bcrypt.hash(this.password, salt);
-// });
+// Hash password before saving to the database
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) {
+    return;
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
 
-// // Instance method to verify password
-// userSchema.methods.matchPassword = async function (enteredPassword) {
-//   return await bcrypt.compare(enteredPassword, this.password);
-// };
+// Method to compare passwords
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
 
 const User = mongoose.model("User", userSchema);
 

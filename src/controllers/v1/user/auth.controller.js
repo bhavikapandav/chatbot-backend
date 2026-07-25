@@ -105,7 +105,8 @@
 const jwt = require("jsonwebtoken");
 const { ApiResponse: { successResponse, failConflict, serverError, failAuthorization, badRequest }, MessageResponse: m } = require("../../../responses")
 const { commonUtils: { isEmpty }, jwtUtils: { generateToken }, bcryptUtils: { hashPassword, comparePassword } } = require("../../../utils")
-const { DataService: { UserService, RoleService, UserRoleService } } = require("../../../services")
+const { DataService: { UserService, RoleService, UserRoleService } } = require("../../../services");
+const { User } = require("../../../models");
 
 
 
@@ -131,7 +132,8 @@ class AuthController {
         first_name: firstName,
         last_name: lastName,
         email: email,
-        password: await hashPassword(password)
+        // password: await hashPassword(password)
+        password: password
       }
       const adminRole = await this.roleService.findRoleBySlug("user");
       const userDetails = await this.userService.create(userPayload);
@@ -181,11 +183,16 @@ class AuthController {
       if (isEmpty(user)) {
         return failAuthorization(0, "Invalid email or password");
       }
+      const isMatch = await user.comparePassword(password);
+      console.log("isMatch=============", isMatch);
 
-      const isMatch = await comparePassword(password, user.password);
       if (!isMatch) {
         return failAuthorization(0, "Invalid email or password");
       }
+      // const isMatch = await (password, user.password);
+      // if (!isMatch) {
+      //   return failAuthorization(0, "Invalid email or password");
+      // }
 
       const userDetails = user.toObject();
       delete userDetails.password;
@@ -203,7 +210,7 @@ class AuthController {
       console.log("---------tokenPayload-----", tokenPayload);
 
       const token = generateToken(tokenPayload);
-
+      await new Promise((resolve) => setTimeout(resolve, 5000));
       return successResponse(1, "user login done", "api", {
         ...userDetails,
         token
