@@ -37,10 +37,6 @@ router.delete("/:conversationId", userAuth, async (req, res) => {
     res.status(result.status).send(result);
 })
 
-router.put("/:conversationId", userAuth, async (req, res) => {
-    let result = await ConversationCtrl.updateConversation(req);
-    res.status(result.status).send(result);
-})
 
 
 module.exports = router;

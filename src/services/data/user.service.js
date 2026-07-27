@@ -10,5 +10,8 @@ class userService {
 
         return await UserRepository.create(requestData);
     };
+    updateOne = async (where, requestData) => {
+        return await UserRepository.updateOne(where, requestData);
+    };
 }
 module.exports = userService;

@@ -103,7 +103,7 @@
 
 // module.exports = new AuthControllers();
 const jwt = require("jsonwebtoken");
-const { ApiResponse: { successResponse, failConflict, serverError, failAuthorization, badRequest }, MessageResponse: m } = require("../../../responses")
+const { ApiResponse: { successResponse, failConflict, serverError, failAuthorization, badRequest, notFound }, MessageResponse: m } = require("../../../responses")
 const { commonUtils: { isEmpty }, jwtUtils: { generateToken }, bcryptUtils: { hashPassword, comparePassword } } = require("../../../utils")
 const { DataService: { UserService, RoleService, UserRoleService } } = require("../../../services");
 const { User } = require("../../../models");
@@ -218,6 +218,99 @@ class AuthController {
     } catch (error) {
       console.log(error);
 
+      const errMessage = typeof error == "string" ? error : error.message;
+      return serverError(0, m.internalServerError, errMessage);
+    }
+  }
+  userDetails = async (req) => {
+    try {
+      const { userId } = req.params;
+
+      if (isEmpty(userId)) {
+        return badRequest("userId is required");
+      }
+
+      const user = await this.userService.findOne({ _id: userId });
+
+      if (isEmpty(user)) {
+        return notFound(0, "user not exist");
+      }
+
+      const userDetails = user.toObject();
+      delete userDetails.password;
+
+      const userRole = await this.userRoleService.findUserRoleByUserId(
+        userDetails._id
+      );
+      console.log("userRole----------------", userRole);
+
+      let role = null;
+      if (userRole && userRole.role_fk) {
+        role = userRole.role_fk;
+      }
+
+      return successResponse(1, "User details retrieved successfully", "api", {
+        ...userDetails,
+        role
+      });
+    } catch (error) {
+      console.log(error);
+
+      const errMessage = typeof error == "string" ? error : error.message;
+      return serverError(0, m.internalServerError, errMessage);
+    }
+  }
+  updateUser = async (req) => {
+    try {
+      const { userId } = req.params;
+      const { firstName, lastName, email, password } = req.body;
+
+      if (isEmpty(userId)) {
+        return badRequest("userId is required");
+      }
+
+      const user = await this.userService.findOne({ _id: userId });
+
+      if (isEmpty(user)) {
+        return notFound(0, "user not exist");
+      }
+
+      const updatePayload = {};
+      if (!isEmpty(firstName)) updatePayload.first_name = firstName;
+      if (!isEmpty(lastName)) updatePayload.last_name = lastName;
+
+      if (!isEmpty(email)) {
+        if (email !== user.email) {
+          const emailExists = await this.userService.findOne({ email, _id: { $ne: userId } });
+          if (!isEmpty(emailExists)) {
+            return failConflict(0, "user already exist with this email id");
+          }
+        }
+        updatePayload.email = email;
+      }
+
+      if (!isEmpty(password)) {
+        updatePayload.password = await hashPassword(password);
+      }
+
+      const updatedUser = await this.userService.updateOne({ _id: userId }, updatePayload);
+
+      const userRole = await this.userRoleService.findUserRoleByUserId(userId);
+
+      const userDetails = updatedUser.toObject();
+      delete userDetails.password;
+
+      let role = null;
+      if (userRole && userRole.role_fk) {
+        role = userRole.role_fk;
+      }
+
+      return successResponse(1, "User details updated successfully", "api", {
+        ...userDetails,
+        role
+      });
+    } catch (error) {
+      console.log(error);
       const errMessage = typeof error == "string" ? error : error.message;
       return serverError(0, m.internalServerError, errMessage);
     }
