@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "npm i && nodemon ./bin/www",
+    "start": "nodemon ./bin/www",
     "seed": "node ./src/scripts/seed.js"
   },
   "dependencies": {
@@ -12,6 +12,7 @@
     "bcryptjs": "^3.0.3",
     "cli-color": "^2.0.4",
     "cookie-parser": "~1.4.4",
+    "cors": "^2.8.6",
     "debug": "~2.6.9",
     "dotenv": "^17.4.2",
     "ejs": "~2.6.1",

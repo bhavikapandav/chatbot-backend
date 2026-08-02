@@ -4,8 +4,8 @@ const connectDB = require("../config/database");
 const seed = async () => {
     try {
         await connectDB();
-        await seedAdmin();
         await seedRole();
+        await seedAdmin();
 
         console.log("Seeding completed.");
 

@@ -136,6 +136,8 @@ class AuthController {
         password: password
       }
       const adminRole = await this.roleService.findRoleBySlug("user");
+      console.log("adminRole==========", adminRole);
+
       const userDetails = await this.userService.create(userPayload);
       console.log("---------id=======", userDetails._id);
 
