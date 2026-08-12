@@ -9,10 +9,17 @@ var logger = require('morgan');
 const cors = require('cors');
 const connectDB = require('./config/database');
 
-// Connect to MongoDB
-connectDB();
-
 var app = express();
+
+// Middleware to ensure DB is connected before handling requests
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(createError(500, 'Database connection failed'));
+  }
+});
 
 // Enable CORS for all routes
 app.use(cors());

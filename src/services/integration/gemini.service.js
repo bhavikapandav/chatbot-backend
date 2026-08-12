@@ -1,5 +1,5 @@
 const ai = require("../../config/gemini")
-console.log({ ai: ai });
+// console.log({ ai: ai });
 
 const generateResponse = async (message) => {
     try {
